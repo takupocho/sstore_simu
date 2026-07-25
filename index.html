@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ソニーストア 見積もりシミュ Ver2.0</title>
+    <title>ソニーストア 見積もりシミュ</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -330,7 +330,6 @@
             border: 1px solid #fef3c7;
             box-sizing: border-box;
         }
-        /* 定型文ボタン用のスタイル */
         .memo-template-btn {
             background: #fef3c7;
             color: #92400e;
@@ -349,7 +348,7 @@
 </head>
 <body>
 
-    <h1>✨ ソニーストア 見証もりシミュ Ver2.0 ✨</h1>
+    <h1>✨ ソニーストア 見積もりシミュ ✨</h1>
 
     <!-- マスター管理セクション -->
     <div class="section" style="background: #fffdf9; border: 1.5px dashed #fcd34d;">
@@ -655,7 +654,6 @@
             <label>メモ欄</label>
             <textarea id="memoInput" style="width: 100%; height: 80px; padding: 10px; font-family: sans-serif; resize: vertical; font-size: 1rem;" placeholder="キャッシュバックキャンペーンなどがあれば入力">・ラッキー抽選会は5,000円が当たったと仮定して計算しています。
 ・My Sony IDでログインしていないため、正確な金額ではありません。</textarea>
-            <!-- 定型文追加用ボタン群 -->
             <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
                 <span style="font-size: 0.85rem; font-weight: bold; color: #78350f; align-self: center;">定型文追加:</span>
                 <button type="button" class="memo-template-btn" onclick="insertMemoTemplate('cashback')">・キャッシュバック 万円</button>
@@ -1313,7 +1311,6 @@
         }
     }
 
-    // メモ欄に定型文を挿入する関数
     function insertMemoTemplate(type) {
         const memoInput = document.getElementById('memoInput');
         let textToAdd = "";
