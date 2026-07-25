@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ソニーストア 見積もりシミュ</title>
+    <title>ソニーストア 見積もりシミュ Ver2.0</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -15,12 +15,12 @@
             font-size: 16px;
         }
         h1 {
-            font-size: 1.25rem; /* スマホで改行されないよう少し小さく調整 */
+            font-size: 1.25rem;
             text-align: center;
             margin-bottom: 20px;
             color: #d97706;
             letter-spacing: 0.05em;
-            white-space: nowrap; /* 強制的に改行させない */
+            white-space: nowrap;
         }
         .section {
             background: #ffffff;
@@ -307,11 +307,49 @@
             box-sizing: border-box;
             display: none;
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid #fef3c7;
+            box-sizing: border-box;
+        }
+        /* 定型文ボタン用のスタイル */
+        .memo-template-btn {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .memo-template-btn:hover {
+            background: #fde68a;
+        }
     </style>
 </head>
 <body>
 
-    <h1>✨ ソニーストア 見積もりシミュ ✨</h1>
+    <h1>✨ ソニーストア 見証もりシミュ Ver2.0 ✨</h1>
 
     <!-- マスター管理セクション -->
     <div class="section" style="background: #fffdf9; border: 1.5px dashed #fcd34d;">
@@ -376,6 +414,86 @@
                     CSVインポート
                     <input type="file" id="importCSVFile" accept=".csv" style="display: none;" onchange="importMasterCSV(event)">
                 </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新規モデル追加モーダル画面 -->
+    <div class="modal-overlay" id="addModelModal">
+        <div class="modal-card">
+            <h3 style="margin-top: 0; color: #b45309; border-bottom: 1px solid #fef3c7; padding-bottom: 10px;">➕ 新規モデル追加</h3>
+            
+            <div class="form-group">
+                <label>カテゴリ選択</label>
+                <select id="modalCategorySelect">
+                    <option value="camera_full">カメラ：フルサイズ</option>
+                    <option value="camera_apsc">カメラ：APS-C / VLOGCAM / FX</option>
+                    <option value="lens_full_gm_zoom">レンズ(フルサイズ)：GM ズーム</option>
+                    <option value="lens_full_gm_prime">レンズ(フルサイズ)：GM 単焦点</option>
+                    <option value="lens_full_g_zoom">レンズ(フルサイズ)：G ズーム</option>
+                    <option value="lens_full_g_prime">レンズ(フルサイズ)：G 単焦点</option>
+                    <option value="lens_full_zeiss_zoom">レンズ(フルサイズ)：ZEISS ズーム</option>
+                    <option value="lens_full_zeiss_prime">レンズ(フルサイズ)：ZEISS 単焦点</option>
+                    <option value="lens_full_other">レンズ(フルサイズ)：無印・その他</option>
+                    <option value="lens_apsc_g_zoom">レンズ(APS-C)：G ズーム</option>
+                    <option value="lens_apsc_g_prime">レンズ(APS-C)：G 単焦点</option>
+                    <option value="lens_apsc_zeiss">レンズ(APS-C)：ZEISS</option>
+                    <option value="lens_apsc_muji_zoom">レンズ(APS-C)：無印 ズーム</option>
+                    <option value="lens_apsc_muji_other">レンズ(APS-C)：無印 単焦点、その他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>ID入力</label>
+                <input type="text" id="modalModelId" placeholder="例: ILCE-7M4">
+            </div>
+
+            <div class="form-group">
+                <label>名称入力</label>
+                <input type="text" id="modalModelName" placeholder="例: α7 IV (ILCE-7M4)">
+            </div>
+
+            <div class="form-group">
+                <label>価格入力 (円)</label>
+                <input type="number" id="modalModelPrice" value="0" min="0" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label>タイプ選択</label>
+                <select id="modalModelType">
+                    <option value="camera">カメラ</option>
+                    <option value="lens">レンズ</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>3年ベーシック (固定)</label>
+                <input type="number" id="modalW_b3" value="0" readonly style="background-color: #f3f4f6; color: #6b7280;">
+            </div>
+
+            <div class="form-group">
+                <label>5年ベーシック入力 (円)</label>
+                <input type="number" id="modalW_b5" value="0" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>3年ワイド入力 (円)</label>
+                <input type="number" id="modalW_w3" value="0" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>5年ワイド入力 (円)</label>
+                <input type="number" id="modalW_w5" value="0" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>商品URL入力</label>
+                <input type="text" id="modalModelUrl" placeholder="https://www.sony.jp/...">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" class="calc-btn" onclick="saveNewModelFromModal()" style="margin-top: 0; flex: 1;">保存する</button>
+                <button type="button" class="danger-btn" onclick="closeAddModal()" style="background: #9ca3af; padding: 12px 20px; font-size: 1rem;">閉じる</button>
             </div>
         </div>
     </div>
@@ -535,7 +653,15 @@
 
         <div class="form-group">
             <label>メモ欄</label>
-            <textarea id="memoInput" style="width: 100%; height: 80px; padding: 10px; font-family: sans-serif; resize: vertical; font-size: 1rem;" placeholder="キャッシュバックキャンペーンなどがあれば入力"></textarea>
+            <textarea id="memoInput" style="width: 100%; height: 80px; padding: 10px; font-family: sans-serif; resize: vertical; font-size: 1rem;" placeholder="キャッシュバックキャンペーンなどがあれば入力">・ラッキー抽選会は5,000円が当たったと仮定して計算しています。
+・My Sony IDでログインしていないため、正確な金額ではありません。</textarea>
+            <!-- 定型文追加用ボタン群 -->
+            <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+                <span style="font-size: 0.85rem; font-weight: bold; color: #78350f; align-self: center;">定型文追加:</span>
+                <button type="button" class="memo-template-btn" onclick="insertMemoTemplate('cashback')">・キャッシュバック 万円</button>
+                <button type="button" class="memo-template-btn" onclick="insertMemoTemplate('direct')">・直送</button>
+                <button type="button" class="memo-template-btn" onclick="insertMemoTemplate('store')">・店入れ</button>
+            </div>
         </div>
 
         <button type="button" class="calc-btn" onclick="calculate()">計算する</button>
@@ -644,6 +770,21 @@
         localStorage.setItem('sony_estimate_history', JSON.stringify(estimateHistory));
     }
 
+    function generateExportFilename(extension) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${year}_${month}_${day}`;
+
+        const storageKey = `sony_master_export_count_${dateStr}`;
+        let count = parseInt(localStorage.getItem(storageKey) || '0', 10) + 1;
+        localStorage.setItem(storageKey, count);
+
+        const countStr = String(count).padStart(2, '0');
+        return `sony_master_backup (${dateStr}_${countStr}).${extension}`;
+    }
+
     function resetMasterData() {
         if (confirm('マスターデータを初期状態に戻しますか？')) {
             localStorage.removeItem('sony_product_database');
@@ -654,17 +795,19 @@
     }
 
     function exportMasterData() {
+        const filename = generateExportFilename('json');
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(productDatabase, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `sony_master_backup.json`);
+        downloadAnchor.setAttribute("download", filename);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
     }
 
     function exportMasterCSV() {
-        let csvContent = "\uFEFF"; // BOM付与でExcelでの文字化け防止
+        const filename = generateExportFilename('csv');
+        let csvContent = "\uFEFF";
         csvContent += "カテゴリ名,ID,名称,タイプ,価格,3年ベーシック,5年ベーシック,3年ワイド,5年ワイド,商品URL\r\n";
 
         for (const [catKey, models] of Object.entries(productDatabase)) {
@@ -690,7 +833,7 @@
         const url = URL.createObjectURL(blob);
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", url);
-        downloadAnchor.setAttribute("download", `sony_master_backup.csv`);
+        downloadAnchor.setAttribute("download", filename);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         downloadAnchor.remove();
@@ -922,23 +1065,69 @@
     }
 
     function openAddModal() {
-        const catKey = document.getElementById('manageCategorySelect').value;
-        const newId = prompt('モデルID:');
-        if (!newId) return;
-        const newName = prompt('モデル名称:');
-        if (!newName) return;
-        const newPrice = parseFloat(prompt('価格:', '100000')) || 0;
-        const isCamera = catKey.includes('camera');
+        const currentCat = document.getElementById('manageCategorySelect').value;
+        document.getElementById('modalCategorySelect').value = currentCat;
+        
+        document.getElementById('modalModelId').value = "";
+        document.getElementById('modalModelName').value = "";
+        document.getElementById('modalModelPrice').value = "0";
+        document.getElementById('modalModelType').value = currentCat.includes('camera') ? 'camera' : 'lens';
+        document.getElementById('modalW_b3').value = "0";
+        document.getElementById('modalW_b5').value = "0";
+        document.getElementById('modalW_w3').value = "0";
+        document.getElementById('modalW_w5').value = "0";
+        document.getElementById('modalModelUrl').value = "";
 
-        if (!productDatabase[catKey]) productDatabase[catKey] = [];
+        document.getElementById('addModelModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModelModal').style.display = 'none';
+    }
+
+    function saveNewModelFromModal() {
+        const catKey = document.getElementById('modalCategorySelect').value;
+        const modelId = document.getElementById('modalModelId').value.trim();
+        const modelName = document.getElementById('modalModelName').value.trim();
+        const price = parseFloat(document.getElementById('modalModelPrice').value) || 0;
+        const type = document.getElementById('modalModelType').value;
+        
+        const b3 = 0;
+        const b5 = parseFloat(document.getElementById('modalW_b5').value) || 0;
+        const w3 = parseFloat(document.getElementById('modalW_w3').value) || 0;
+        const w5 = parseFloat(document.getElementById('modalW_w5').value) || 0;
+        const url = document.getElementById('modalModelUrl').value.trim();
+
+        if (!modelId) {
+            alert('モデルIDを入力してください。');
+            return;
+        }
+        if (!modelName) {
+            alert('モデル名称を入力してください。');
+            return;
+        }
+
+        if (!productDatabase[catKey]) {
+            productDatabase[catKey] = [];
+        }
+
         productDatabase[catKey].push({
-            id: newId, name: newName, type: isCamera ? 'camera' : 'lens', price: newPrice, url: "",
-            warranty: { b3: 0, b5: Math.floor(newPrice * 0.05), w3: Math.floor(newPrice * 0.05), w5: Math.floor(newPrice * 0.1) }
+            id: modelId,
+            name: modelName,
+            type: type,
+            price: price,
+            url: url,
+            warranty: { b3, b5, w3, w5 }
         });
 
         saveProductDatabase();
+        
+        document.getElementById('manageCategorySelect').value = catKey;
         renderMasterTable();
         onCategoryChange();
+
+        closeAddModal();
+        alert('新しいモデルを追加しました！');
     }
 
     function onCategoryChange() {
@@ -1069,22 +1258,79 @@
         }
     }
 
-    function addTicketRow(name = "ラッキー抽選会", price = 0) {
+    function addTicketRow(name = "ラッキー抽選会", price = 5000) {
         const container = document.getElementById('ticketsContainer');
         const div = document.createElement('div');
         div.className = 'ticket-item';
+        
         div.innerHTML = `
-            <select class="ticket-name" style="flex: 1; min-width: 140px;">
+            <select class="ticket-name" style="flex: 1; min-width: 140px;" onchange="onTicketNameChange(this)">
                 <option value="ラッキー抽選会" ${name==='ラッキー抽選会'?'selected':''}>ラッキー抽選会</option>
                 <option value="ワンズ店頭抽選会" ${name==='ワンズ店頭抽選会'?'selected':''}>ワンズ店頭抽選会</option>
                 <option value="αあんしんプログラムご愛顧感謝" ${name==='αあんしんプログラムご愛顧感謝'?'selected':''}>αあんしんプログラムご愛顧感謝</option>
                 <option value="αCafe賞" ${name==='αCafe賞'?'selected':''}>αCafe賞</option>
                 <option value="お誕生日" ${name==='お誕生日'?'selected':''}>お誕生日</option>
             </select>
-            <input type="text" value="${price}" style="width: 90px;" class="ticket-price"> 円分
+            <span class="ticket-value-container"></span>
             <button type="button" class="danger-btn" onclick="this.parentElement.remove()">削除</button>
         `;
         container.appendChild(div);
+        
+        updateTicketValueInput(div.querySelector('.ticket-name'), price);
+    }
+
+    function onTicketNameChange(selectElem) {
+        const ticketName = selectElem.value;
+        let defaultPrice = 5000;
+        if (ticketName === "αあんしんプログラムご愛顧感謝") {
+            defaultPrice = 3000;
+        } else if (ticketName === "ワンズ店頭抽選会") {
+            defaultPrice = 1000;
+        } else if (ticketName === "お誕生日") {
+            defaultPrice = 500;
+        } else if (ticketName === "ラッキー抽選会") {
+            defaultPrice = 5000;
+        } else if (ticketName === "αCafe賞") {
+            defaultPrice = 0;
+        }
+        updateTicketValueInput(selectElem, defaultPrice);
+    }
+
+    function updateTicketValueInput(selectElem, currentPrice) {
+        const ticketName = selectElem.value;
+        const container = selectElem.parentElement.querySelector('.ticket-value-container');
+        
+        if (ticketName === "ラッキー抽選会") {
+            const amounts = [100000, 10000, 5000, 4000, 2000, 1500, 1000, 800];
+            let optionsHtml = '';
+            amounts.forEach(amt => {
+                const selected = (Number(currentPrice) === amt) ? 'selected' : '';
+                optionsHtml += `<option value="${amt}" ${selected}>${formatNumber(amt)}円</option>`;
+            });
+            container.innerHTML = `<select class="ticket-price" style="width: 120px;">${optionsHtml}</select>`;
+        } else {
+            container.innerHTML = `<input type="text" value="${currentPrice}" style="width: 90px;" class="ticket-price"> 円分`;
+        }
+    }
+
+    // メモ欄に定型文を挿入する関数
+    function insertMemoTemplate(type) {
+        const memoInput = document.getElementById('memoInput');
+        let textToAdd = "";
+        if (type === 'cashback') {
+            textToAdd = "・キャッシュバック 万円";
+        } else if (type === 'direct') {
+            textToAdd = "・直送";
+        } else if (type === 'store') {
+            textToAdd = "・店入れ";
+        }
+
+        if (memoInput.value.trim() !== "") {
+            memoInput.value += "\n" + textToAdd;
+        } else {
+            memoInput.value = textToAdd;
+        }
+        memoInput.focus();
     }
 
     function resetFormForNewEstimate() {
@@ -1097,7 +1343,7 @@
         document.getElementById('loanDownPayment').value = "0";
         document.getElementById('loanFeeSelect').value = "24";
         document.getElementById('loanCount').value = "24";
-        document.getElementById('memoInput').value = "";
+        document.getElementById('memoInput').value = "・ラッキー抽選会は5,000円が当たったと仮定して計算しています。\n・My Sony IDでログインしていないため、正確な金額ではありません。";
         document.getElementById('ticketsContainer').innerHTML = "";
         
         const firstWarranty = document.querySelector('input[name="warranty"]');
@@ -1230,7 +1476,9 @@
         ticketItems.forEach(item => {
             const tSelect = item.querySelector('.ticket-name');
             const tName = tSelect.value;
-            const tPrice = parseFloat(item.querySelector('.ticket-price').value.replace(/,/g, '')) || 0;
+            const priceElem = item.querySelector('.ticket-price');
+            const tPrice = priceElem ? (parseFloat(priceElem.value.replace(/,/g, '')) || 0) : 0;
+            
             if (tPrice > 0) {
                 currentPrice -= tPrice;
                 if (currentPrice < 0) currentPrice = 0;
@@ -1311,7 +1559,11 @@
         const memo = document.getElementById('memoInput').value.trim();
         if (memo !== "") {
             outputLines.push(``);
-            outputLines.push(`・メモ：${memo}`);
+            outputLines.push(`【メモ】`);
+            const memoLines = memo.split('\n');
+            memoLines.forEach(line => {
+                outputLines.push(`${line}`);
+            });
         }
 
         document.getElementById('resultText').value = outputLines.join('\n');
@@ -1326,9 +1578,10 @@
 
         const tickets = [];
         document.querySelectorAll('.ticket-item').forEach(item => {
+            const priceElem = item.querySelector('.ticket-price');
             tickets.push({
                 name: item.querySelector('.ticket-name').value,
-                price: item.querySelector('.ticket-price').value
+                price: priceElem ? priceElem.value : 0
             });
         });
 
