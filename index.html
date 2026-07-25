@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ソニーストア 見積もりシミュ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fffaf7;
+            color: #4a4a4a;
+            max-width: 950px;
+            margin: 15px auto;
+            padding: 15px;
+            font-size: 16px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #d97706;
+            letter-spacing: 0.05em;
+        }
+        .section {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid #fef3c7;
+        }
+        .form-group {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            width: 100%;
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: #78350f;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            background-color: #fffcf8;
+            transition: all 0.2s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+        .toggle-btn {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background: #f59e0b;
+            color: #fff;
+            border-color: #d97706;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+        .warranty-options label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: normal;
+            width: auto;
+            font-size: 0.95rem;
+        }
+        .ticket-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        button.calc-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+            transition: transform 0.1s;
+        }
+        button.calc-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        button.save-est-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.25);
+            transition: transform 0.1s;
+        }
+        button.save-est-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        button.new-est-btn {
+            display: block;
+            width: 100%;
+            background: #9ca3af;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        button.new-est-btn:hover {
+            background: #6b7280;
+        }
+        button.sub-btn {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        button.sub-btn:hover {
+            background: #2563eb;
+        }
+        .action-btn-export, .action-btn-import, .action-btn-csv {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+        .action-btn-export {
+            background: #06b6d4;
+        }
+        .action-btn-export:hover {
+            background: #0891b2;
+        }
+        .action-btn-csv {
+            background: #10b981;
+        }
+        .action-btn-csv:hover {
+            background: #059669;
+        }
+        .action-btn-import {
+            background: #8b5cf6;
+        }
+        .action-btn-import:hover {
+            background: #7c3aed;
+        }
+        .coupon-action-btn {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .coupon-action-btn.active {
+            background: #d97706;
+            color: #fff;
+            border-color: #b45309;
+        }
+        button.link-btn, a.link-btn {
+            background: #60a5fa;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        button.link-btn:hover, a.link-btn:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+        button.danger-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        button.danger-btn:hover {
+            background: #dc2626;
+        }
+        .result-box {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid #fef3c7;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            resize: vertical;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            background-color: #fffcf8;
+        }
+        #resultText {
+            height: 500px;
+        }
+        table.master-table, table.history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        table.master-table th, table.master-table td, table.history-table th, table.history-table td {
+            border: 1px solid #fef3c7;
+            padding: 8px;
+            text-align: left;
+        }
+        table.master-table th, table.history-table th {
+            background: #fffbeb;
+            color: #78350f;
+            white-space: nowrap;
+        }
+        .master-toggle-header {
+            cursor: pointer;
+            margin: 0;
+            font-size: 1rem;
+            color: #b45309;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .master-content {
+            display: none;
+            margin-top: 15px;
+        }
+        .backup-panel {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #fef3c7;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        #loanSettingsContainer {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✨ ソニーストア 見積もりシミュ ✨</h1>
+
+    <!-- マスター管理セクション -->
+    <div class="section" style="background: #fffdf9; border: 1.5px dashed #fcd34d;">
+        <h3 class="master-toggle-header" onclick="toggleMasterPanel()">
+            <span>🛠️ マスターデータ管理・バックアップ</span>
+            <span id="toggleIcon" style="font-size: 0.85rem; font-weight: normal; color: #d97706;">[ ＋ 開く ]</span>
+        </h3>
+        <div class="master-content" id="masterContentBody">
+            <div class="form-group">
+                <label>管理対象カテゴリ</label>
+                <select id="manageCategorySelect" onchange="renderMasterTable()">
+                    <option value="camera_full">カメラ：フルサイズ</option>
+                    <option value="camera_apsc">カメラ：APS-C / VLOGCAM / FX</option>
+                    <option value="lens_full_gm_zoom">レンズ(フルサイズ)：GM ズーム</option>
+                    <option value="lens_full_gm_prime">レンズ(フルサイズ)：GM 単焦点</option>
+                    <option value="lens_full_g_zoom">レンズ(フルサイズ)：G ズーム</option>
+                    <option value="lens_full_g_prime">レンズ(フルサイズ)：G 単焦点</option>
+                    <option value="lens_full_zeiss_zoom">レンズ(フルサイズ)：ZEISS ズーム</option>
+                    <option value="lens_full_zeiss_prime">レンズ(フルサイズ)：ZEISS 単焦点</option>
+                    <option value="lens_full_other">レンズ(フルサイズ)：無印・その他</option>
+                    <option value="lens_apsc_g_zoom">レンズ(APS-C)：G ズーム</option>
+                    <option value="lens_apsc_g_prime">レンズ(APS-C)：G 単焦点</option>
+                    <option value="lens_apsc_zeiss">レンズ(APS-C)：ZEISS</option>
+                    <option value="lens_apsc_muji_zoom">レンズ(APS-C)：無印 ズーム</option>
+                    <option value="lens_apsc_muji_other">レンズ(APS-C)：無印 単焦点、その他</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                <button type="button" class="sub-btn" onclick="openAddModal()">+ 新規モデル追加</button>
+                <button type="button" class="danger-btn" onclick="resetMasterData()" style="background: #9ca3af;">初期データに戻す</button>
+            </div>
+            <div style="max-height: 320px; overflow-x: auto; overflow-y: auto;">
+                <table class="master-table" id="masterTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>価格</th>
+                            <th>タイプ</th>
+                            <th>3年ベーシック</th>
+                            <th>5年ベーシック</th>
+                            <th>3年ワイド</th>
+                            <th>5年ワイド</th>
+                            <th>商品URL</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="masterTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="backup-panel">
+                <span style="font-weight: bold; font-size: 0.9rem; color: #78350f;">💾 マスターバックアップ:</span>
+                <button type="button" class="action-btn-export" onclick="exportMasterData()">JSONエクスポート</button>
+                <label class="action-btn-import" style="margin: 0;">
+                    JSONインポート
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importMasterData(event)">
+                </label>
+                <button type="button" class="action-btn-csv" onclick="exportMasterCSV()">CSVエクスポート</button>
+                <label class="action-btn-csv" style="margin: 0;">
+                    CSVインポート
+                    <input type="file" id="importCSVFile" accept=".csv" style="display: none;" onchange="importMasterCSV(event)">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- メイン計算フォーム -->
+    <div class="section">
+        <input type="hidden" id="editingEstimateId" value="">
+        
+        <button type="button" class="new-est-btn" onclick="resetFormForNewEstimate()">➕ 新規見積もり（入力をクリア）</button>
+
+        <div class="form-group">
+            <label>お名前</label>
+            <input type="text" id="nameInput" value="" placeholder="お名前を入力">
+        </div>
+
+        <div class="form-group">
+            <label>商品カテゴリ</label>
+            <select id="categorySelect" onchange="onCategoryChange()">
+                <option value="" disabled selected>カテゴリーを選択してください</option>
+                <option value="camera_full">カメラ：フルサイズ</option>
+                <option value="camera_apsc">カメラ：APS-C / VLOGCAM / FX</option>
+                <option value="lens_full_gm_zoom">レンズ(フルサイズ)：GM ズーム</option>
+                <option value="lens_full_gm_prime">レンズ(フルサイズ)：GM 単焦点</option>
+                <option value="lens_full_g_zoom">レンズ(フルサイズ)：G ズーム</option>
+                <option value="lens_full_g_prime">レンズ(フルサイズ)：G 単焦点</option>
+                <option value="lens_full_zeiss_zoom">レンズ(フルサイズ)：ZEISS ズーム</option>
+                <option value="lens_full_zeiss_prime">レンズ(フルサイズ)：ZEISS 単焦点</option>
+                <option value="lens_full_other">レンズ(フルサイズ)：無印・その他</option>
+                <option value="lens_apsc_g_zoom">レンズ(APS-C)：G ズーム</option>
+                <option value="lens_apsc_g_prime">レンズ(APS-C)：G 単焦点</option>
+                <option value="lens_apsc_zeiss">レンズ(APS-C)：ZEISS</option>
+                <option value="lens_apsc_muji_zoom">レンズ(APS-C)：無印 ズーム</option>
+                <option value="lens_apsc_muji_other">レンズ(APS-C)：無印 単焦点、その他</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>型式（マスター選択）</label>
+            <select id="modelSelect" onchange="onModelSelectChange()">
+                <option value="" disabled selected>商品を選択してください</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>商品タイプ</label>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="toggle-btn active" id="typeCamera">カメラ本体</button>
+                <button type="button" class="toggle-btn" id="typeLens">レンズ</button>
+            </div>
+        </div>
+
+        <div class="form-group" id="anshinGroup" style="display: none;">
+            <label>αあんしんプログラム</label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="toggle-btn active" id="anshinOff" onclick="switchAnshin(false)">非加入 / 通常</button>
+                <button type="button" class="toggle-btn" id="anshinOn" onclick="switchAnshin(true)">加入 (保証優待適用)</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>型式名（詳細）</label>
+            <div style="display: flex; gap: 8px; width: 100%; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="modelInput" value="" placeholder="型式名" style="flex: 1; min-width: 180px;">
+                <a href="#" id="productLinkBtn" class="link-btn" target="_blank" style="display:none;">🌐 商品ページ</a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>金額</label>
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                <input type="text" id="priceInput" value="0" readonly style="flex: 1;"> <span>円 (税込)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>割引クーポンを選択</label>
+            <select id="couponSelect">
+                <option value="0" selected>なし</option>
+                <option value="10">10%OFF (通常)</option>
+                <option value="13">13%OFF (ワンズ店頭)</option>
+                <option value="15_anshin">15%OFF (αあんしんプログラムご愛顧感謝)</option>
+                <option value="15_株主">15%OFF (株主優待)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>長期保証</label>
+            <div class="warranty-options" id="warrantyGroup">
+                <label>
+                    <input type="radio" name="warranty" value="b3" checked> 3年ベーシック: 
+                    <input type="text" id="w_b3_val" value="0" style="width:90px;" readonly> 円
+                </label>
+                <label style="flex-wrap: wrap;">
+                    <input type="radio" name="warranty" value="b5"> 5年ベーシック: 
+                    <input type="text" id="w_b5_val" value="0" style="width:90px;" readonly> 円 
+                    <button type="button" class="coupon-action-btn" id="btn_b5_free" onclick="toggleCameraWarranty('b5')" style="display:none;">5年ベーシック無料</button>
+                </label>
+                <label style="flex-wrap: wrap;">
+                    <input type="radio" name="warranty" value="w3"> 3年ワイド: 
+                    <input type="text" id="w_w3_val" value="0" style="width:90px;" readonly> 円 
+                    <button type="button" class="coupon-action-btn" id="btn_w3_free" onclick="toggleCameraWarranty('w3')" style="display:none;">3年ワイド無料</button>
+                </label>
+                <label style="flex-wrap: wrap;">
+                    <input type="radio" name="warranty" value="w5"> 5年ワイド: 
+                    <input type="text" id="w_w5_val" value="0" style="width:90px;" readonly> 円 
+                    <button type="button" class="coupon-action-btn" id="btn_w5_half" onclick="toggleCameraWarranty('w5')" style="display:none;">5年ワイド半額</button>
+                    <span id="w510OffLabel" style="color: #d97706; display: none; font-size: 0.85rem; width: 100%;">（10%OFF適応）</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>お買い物券を追加</label>
+            <div style="width: 100%;">
+                <div id="ticketsContainer"></div>
+                <button type="button" class="sub-btn" onclick="addTicketRow()" style="margin-top: 8px;">+ お買い物券を追加</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>ソニーポイントを利用</label>
+            <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                <input type="number" id="sonyPointInput" value="0" min="0" step="1" placeholder="0" style="flex: 1;"> <span>pt (1pt = 1円)</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>支払い方法を選択</label>
+            <select id="paymentSelect" onchange="onPaymentChange()">
+                <option value="none" selected>現金 (パートナー決済)</option>
+                <option value="none">クレジットカード</option>
+                <option value="sony_card">Sony Card 決済 (3%OFF)</option>
+                <option value="sony_bank">Sony Bank WALLET 決済 (3%OFF)</option>
+                <option value="loan">分割払い (JACCS)</option>
+                <option value="none">PayPay 払い</option>
+                <option value="none">d 払い</option>
+            </select>
+
+            <div id="loanSettingsContainer">
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem; margin-bottom: 4px; display:block;">・頭金 (円)</label>
+                    <input type="number" id="loanDownPayment" value="0" placeholder="0" style="width: 100%; padding: 8px;">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem; margin-bottom: 4px; display:block;">・分割払い手数料を選択</label>
+                    <select id="loanFeeSelect" style="width: 100%; padding: 8px;">
+                        <option value="12">12回払いまで分割払い手数料 0円</option>
+                        <option value="24" selected>24回払いまで分割払い手数料 0円</option>
+                        <option value="60">60回払いまで分割払い手数料 0円</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.9rem; margin-bottom: 4px; display:block;">・支払い回数 (回)</label>
+                    <input type="number" id="loanCount" value="24" min="1" max="60" style="width: 100%; padding: 8px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>メモ欄</label>
+            <textarea id="memoInput" style="width: 100%; height: 80px; padding: 10px; font-family: sans-serif; resize: vertical; font-size: 1rem;" placeholder="キャッシュバックキャンペーンなどがあれば入力"></textarea>
+        </div>
+
+        <button type="button" class="calc-btn" onclick="calculate()">計算する</button>
+        <button type="button" class="save-est-btn" onclick="saveEstimate()">📝 この内容で見積もりを保存 / 更新する</button>
+    </div>
+
+    <div class="result-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <h3 style="margin: 0; color: #78350f;">計算結果 (出力内容)</h3>
+            <button type="button" class="sub-btn" onclick="copyResultText()" style="background: #10b981;">📋 テキストをコピー</button>
+        </div>
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 8px;" id="copyStatusMsg">下のテキストボックスはクリックしてコピーできます</p>
+        <textarea id="resultText" readonly></textarea>
+    </div>
+
+    <div class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #78350f;">📋 保存済み見積もり履歴一覧</h3>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <button type="button" class="action-btn-export" onclick="exportEstimateHistory()">履歴JSONエクスポート</button>
+                <label class="action-btn-import" style="margin: 0;">
+                    履歴JSONインポート
+                    <input type="file" id="importHistoryFile" accept=".json" style="display: none;" onchange="importEstimateHistory(event)">
+                </label>
+                <button type="button" class="danger-btn" onclick="clearAllEstimates()">履歴をすべてクリア</button>
+            </div>
+        </div>
+        <div style="max-height: 350px; overflow-y: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>日時</th>
+                        <th>お名前</th>
+                        <th>商品名 / 型式</th>
+                        <th>最終金額</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr><td colspan="5" style="text-align: center; color: #777;">保存された見積もりはありません。</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    const defaultProductDatabase = {
+        camera_full: [
+            { id: "ILCE-1M2", name: "α1 II (ILCE-1M2)", type: "camera", price: 990000, url: "https://www.sony.jp/ichigan/products/ILCE-1M2/", warranty: { b3: 0, b5: 49500, w3: 49500, w5: 99000 } },
+            { id: "ILCE-1", name: "α1 (ILCE-1)", type: "camera", price: 880000, url: "https://www.sony.jp/ichigan/products/ILCE-1/", warranty: { b3: 0, b5: 44000, w3: 4400, w5: 88000 } },
+            { id: "ILCE-7SM3", name: "α7S III (ILCE-7SM3)", type: "camera", price: 463455, url: "https://www.sony.jp/ichigan/products/ILCE-7SM3/", warranty: { b3: 0, b5: 23173, w3: 23173, w5: 46345 } },
+            { id: "ILCE-7RM5", name: "α7R V (ILCE-7RM5)", type: "camera", price: 533500, url: "https://www.sony.jp/ichigan/products/ILCE-7RM5/", warranty: { b3: 0, b5: 26675, w3: 28400, w5: 53350 } },
+            { id: "ILCE-7M4", name: "α7 IV (ILCE-7M4)", type: "camera", price: 361900, url: "https://www.sony.jp/ichigan/products/ILCE-7M4/", warranty: { b3: 0, b5: 16500, w3: 16500, w5: 33000 } },
+            { id: "ILCE-7CM2", name: "α7C II (ILCE-7CM2)", type: "camera", price: 304110, url: "https://www.sony.jp/ichigan/products/ILCE-7CM2/", warranty: { b3: 0, b5: 15206, w3: 15206, w5: 30411 } },
+            { id: "ZV-E1", name: "VLOGCAM ZV-E1", type: "camera", price: 328900, url: "https://www.sony.jp/vlogcam/products/ZV-E1/", warranty: { b3: 0, b5: 16445, w3: 16445, w5: 32890 } }
+        ],
+        camera_apsc: [
+            { id: "ILCE-6700", name: "α6700 (ILCE-6700)", type: "camera", price: 218900, url: "https://www.sony.jp/ichigan/products/ILCE-6700/", warranty: { b3: 0, b5: 10945, w3: 10945, w5: 21890 } },
+            { id: "ZV-E10", name: "VLOGCAM ZV-E10 (ZV-E10)", type: "camera", price: 88000, url: "https://www.sony.jp/vlogcam/products/ZV-E10/", warranty: { b3: 0, b5: 4400, w3: 4400, w5: 8800 } }
+        ],
+        lens_full_gm_zoom: [
+            { id: "SEL1635GM2", name: "FE 16-35mm F2.8 GM II (SEL1635GM2)", type: "lens", price: 358600, url: "https://www.sony.jp/ichigan/products/SEL1635GM2/", warranty: { b3: 0, b5: 17600, w3: 17600, w5: 35200 } },
+            { id: "SEL2470GM2", name: "FE 24-70mm F2.8 GM II (SEL2470GM2)", type: "lens", price: 319000, url: "https://www.sony.jp/ichigan/products/SEL2470GM2/", warranty: { b3: 0, b5: 15950, w3: 15950, w5: 31900 } }
+        ],
+        lens_full_gm_prime: [
+            { id: "SEL50F14GM", name: "FE 50mm F1.4 GM (SEL50F14GM)", type: "lens", price: 206800, url: "https://www.sony.jp/ichigan/products/SEL50F14GM/", warranty: { b3: 0, b5: 10340, w3: 10340, w5: 20680 } }
+        ],
+        lens_full_g_zoom: [
+            { id: "SEL2070G", name: "FE 20-70mm F4 G (SEL2070G)", type: "lens", price: 195800, url: "https://www.sony.jp/ichigan/products/SEL2070G/", warranty: { b3: 0, b5: 9790, w3: 9790, w5: 19580 } }
+        ],
+        lens_full_g_prime: [],
+        lens_full_zeiss_zoom: [],
+        lens_full_zeiss_prime: [],
+        lens_full_other: [],
+        lens_apsc_g_zoom: [],
+        lens_apsc_g_prime: [],
+        lens_apsc_zeiss: [],
+        lens_apsc_muji_zoom: [],
+        lens_apsc_muji_other: []
+    };
+
+    let productDatabase = loadProductDatabase();
+    let estimateHistory = loadEstimateHistory();
+
+    function loadProductDatabase() {
+        const saved = localStorage.getItem('sony_product_database');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) { console.error(e); }
+        }
+        return JSON.parse(JSON.stringify(defaultProductDatabase));
+    }
+
+    function saveProductDatabase() {
+        localStorage.setItem('sony_product_database', JSON.stringify(productDatabase));
+    }
+
+    function loadEstimateHistory() {
+        const saved = localStorage.getItem('sony_estimate_history');
+        if (saved) {
+            try { return JSON.parse(saved); } catch (e) { console.error(e); }
+        }
+        return [];
+    }
+
+    function saveEstimateHistoryStorage() {
+        localStorage.setItem('sony_estimate_history', JSON.stringify(estimateHistory));
+    }
+
+    function resetMasterData() {
+        if (confirm('マスターデータを初期状態に戻しますか？')) {
+            localStorage.removeItem('sony_product_database');
+            productDatabase = JSON.parse(JSON.stringify(defaultProductDatabase));
+            renderMasterTable();
+            alert('初期状態に戻しました。');
+        }
+    }
+
+    function exportMasterData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(productDatabase, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `sony_master_backup.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function exportMasterCSV() {
+        let csvContent = "\uFEFF"; // BOM付与でExcelでの文字化け防止
+        csvContent += "カテゴリ名,ID,名称,タイプ,価格,3年ベーシック,5年ベーシック,3年ワイド,5年ワイド,商品URL\r\n";
+
+        for (const [catKey, models] of Object.entries(productDatabase)) {
+            models.forEach(m => {
+                const w = m.warranty || { b3: 0, b5: 0, w3: 0, w5: 0 };
+                const row = [
+                    `"${catKey}"`,
+                    `"${m.id || ''}"`,
+                    `"${(m.name || '').replace(/"/g, '""')}"`,
+                    `"${m.type || ''}"`,
+                    m.price || 0,
+                    w.b3 || 0,
+                    w.b5 || 0,
+                    w.w3 || 0,
+                    w.w5 || 0,
+                    `"${m.url || ''}"`
+                ];
+                csvContent += row.join(",") + "\r\n";
+            });
+        }
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", url);
+        downloadAnchor.setAttribute("download", `sony_master_backup.csv`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function importMasterData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                productDatabase = JSON.parse(e.target.result);
+                saveProductDatabase();
+                renderMasterTable();
+                onCategoryChange();
+                alert('マスターデータのインポート完了しました！');
+            } catch (err) {
+                alert('ファイル読み込みに失敗しました。');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function importMasterCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const text = e.target.result;
+                const lines = text.split(/\r\n|\n/);
+                
+                // 新しい一時データベース構造を作成（既存キーをすべて保持しつつモデルをクリア）
+                let newDb = {};
+                for (const key of Object.keys(defaultProductDatabase)) {
+                    newDb[key] = [];
+                }
+
+                // 1行目はヘッダーとみなしてスキップ
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    // CSVパース（ダブルクォーテーション対応簡易版）
+                    let row = [];
+                    let inQuotes = false;
+                    let currentVal = '';
+                    for (let c = 0; c < line.length; c++) {
+                        let char = line[c];
+                        if (char === '"') {
+                            if (inQuotes && line[c+1] === '"') {
+                                currentVal += '"';
+                                c++;
+                            } else {
+                                inQuotes = !inQuotes;
+                            }
+                        } else if (char === ',' && !inQuotes) {
+                            row.push(currentVal);
+                            currentVal = '';
+                        } else {
+                            currentVal += char;
+                        }
+                    }
+                    row.push(currentVal);
+
+                    if (row.length >= 10) {
+                        const catKey = row[0].trim();
+                        const modelId = row[1].trim();
+                        const name = row[2].trim();
+                        const type = row[3].trim() || 'lens';
+                        const price = parseFloat(row[4]) || 0;
+                        const b3 = parseFloat(row[5]) || 0;
+                        const b5 = parseFloat(row[6]) || 0;
+                        const w3 = parseFloat(row[7]) || 0;
+                        const w5 = parseFloat(row[8]) || 0;
+                        const url = row[9].trim();
+
+                        if (!newDb[catKey]) {
+                            newDb[catKey] = [];
+                        }
+
+                        newDb[catKey].push({
+                            id: modelId,
+                            name: name,
+                            type: type,
+                            price: price,
+                            url: url,
+                            warranty: { b3, b5, w3, w5 }
+                        });
+                    }
+                }
+
+                productDatabase = newDb;
+                saveProductDatabase();
+                renderMasterTable();
+                onCategoryChange();
+                alert('CSVマスターデータのインポートが完了しました！');
+            } catch (err) {
+                console.error(err);
+                alert('CSVファイルの読み込みまたはパースに失敗しました。');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function exportEstimateHistory() {
+        if (estimateHistory.length === 0) {
+            alert('エクスポートする保存済み履歴がありません。');
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(estimateHistory, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `sony_estimate_history_backup.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importEstimateHistory(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (Array.isArray(importedData)) {
+                    estimateHistory = importedData;
+                    saveEstimateHistoryStorage();
+                    renderEstimateHistory();
+                    alert('見積もり履歴のインポートが完了しました！');
+                } else {
+                    alert('データの形式が正しくありません。');
+                }
+            } catch (err) {
+                alert('ファイル読み込みに失敗しました。');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    let isAnshinJoin = false;
+    let cameraCouponState = { b5: false, w3: false, w5: false };
+    let originalWarrantyPrices = { b3: 0, b5: 0, w3: 0, w5: 0 };
+
+    function toggleMasterPanel() {
+        const content = document.getElementById('masterContentBody');
+        const icon = document.getElementById('toggleIcon');
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            icon.textContent = '[ ＋ 開く ]';
+        } else {
+            content.style.display = 'block';
+            icon.textContent = '[ － 閉じる ]';
+        }
+    }
+
+    function formatNumber(num) {
+        return num.toLocaleString();
+    }
+
+    function renderMasterTable() {
+        const catKey = document.getElementById('manageCategorySelect').value;
+        const models = productDatabase[catKey] || [];
+        const tbody = document.getElementById('masterTableBody');
+        tbody.innerHTML = "";
+
+        models.forEach((m, index) => {
+            const w = m.warranty || { b3: 0, b5: 0, w3: 0, w5: 0 };
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${m.id}" id="edit_id_${index}" style="width:140px; min-width:140px;"></td>
+                <td><input type="text" value="${m.name}" id="edit_name_${index}" style="width:200px; min-width:200px;"></td>
+                <td><input type="number" value="${m.price}" id="edit_price_${index}" style="width:110px; min-width:110px;"></td>
+                <td>
+                    <select id="edit_type_${index}" style="width:110px; min-width:110px;">
+                        <option value="lens" ${m.type==='lens'?'selected':''}>レンズ</option>
+                        <option value="camera" ${m.type==='camera'?'selected':''}>カメラ</option>
+                    </select>
+                </td>
+                <td><input type="number" value="${w.b3}" id="edit_b3_${index}" style="width:100px; min-width:100px;"></td>
+                <td><input type="number" value="${w.b5}" id="edit_b5_${index}" style="width:100px; min-width:100px;"></td>
+                <td><input type="number" value="${w.w3}" id="edit_w3_${index}" style="width:100px; min-width:100px;"></td>
+                <td><input type="number" value="${w.w5}" id="edit_w5_${index}" style="width:100px; min-width:100px;"></td>
+                <td><input type="text" value="${m.url || ''}" id="edit_url_${index}" style="width:260px; min-width:260px;"></td>
+                <td style="white-space: nowrap;">
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <button type="button" class="sub-btn" onclick="updateModel(${index})" style="padding:6px 10px; font-size:0.85rem;">保存</button>
+                        <button type="button" class="danger-btn" onclick="deleteModel(${index})" style="padding:6px 10px; font-size:0.85rem;">削除</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateModel(index) {
+        const catKey = document.getElementById('manageCategorySelect').value;
+        const newId = document.getElementById(`edit_id_${index}`).value.trim();
+        const newName = document.getElementById(`edit_name_${index}`).value.trim();
+        const newPrice = parseFloat(document.getElementById(`edit_price_${index}`).value) || 0;
+        const newType = document.getElementById(`edit_type_${index}`).value;
+        const newUrl = document.getElementById(`edit_url_${index}`).value.trim();
+
+        const b3Val = parseFloat(document.getElementById(`edit_b3_${index}`).value) || 0;
+        const b5Val = parseFloat(document.getElementById(`edit_b5_${index}`).value) || 0;
+        const w3Val = parseFloat(document.getElementById(`edit_w3_${index}`).value) || 0;
+        const w5Val = parseFloat(document.getElementById(`edit_w5_${index}`).value) || 0;
+
+        productDatabase[catKey][index] = {
+            id: newId, name: newName, type: newType, price: newPrice, url: newUrl,
+            warranty: { b3: b3Val, b5: b5Val, w3: w3Val, w5: w5Val }
+        };
+
+        saveProductDatabase();
+        alert('マスターデータを更新しました。');
+        renderMasterTable();
+        onCategoryChange();
+    }
+
+    function deleteModel(index) {
+        if (!confirm('削除しますか？')) return;
+        const catKey = document.getElementById('manageCategorySelect').value;
+        productDatabase[catKey].splice(index, 1);
+        saveProductDatabase();
+        renderMasterTable();
+        onCategoryChange();
+    }
+
+    function openAddModal() {
+        const catKey = document.getElementById('manageCategorySelect').value;
+        const newId = prompt('モデルID:');
+        if (!newId) return;
+        const newName = prompt('モデル名称:');
+        if (!newName) return;
+        const newPrice = parseFloat(prompt('価格:', '100000')) || 0;
+        const isCamera = catKey.includes('camera');
+
+        if (!productDatabase[catKey]) productDatabase[catKey] = [];
+        productDatabase[catKey].push({
+            id: newId, name: newName, type: isCamera ? 'camera' : 'lens', price: newPrice, url: "",
+            warranty: { b3: 0, b5: Math.floor(newPrice * 0.05), w3: Math.floor(newPrice * 0.05), w5: Math.floor(newPrice * 0.1) }
+        });
+
+        saveProductDatabase();
+        renderMasterTable();
+        onCategoryChange();
+    }
+
+    function onCategoryChange() {
+        const catKey = document.getElementById('categorySelect').value;
+        const models = productDatabase[catKey] || [];
+        const modelSelect = document.getElementById('modelSelect');
+        
+        modelSelect.innerHTML = '<option value="" disabled selected>商品を選択してください</option>';
+        
+        models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id;
+            opt.textContent = m.name;
+            modelSelect.appendChild(opt);
+        });
+
+        onModelSelectChange();
+    }
+
+    function onModelSelectChange() {
+        const catKey = document.getElementById('categorySelect').value;
+        const models = productDatabase[catKey] || [];
+        const selectedId = document.getElementById('modelSelect').value;
+        const product = models.find(m => m.id === selectedId);
+
+        if (product) {
+            document.getElementById('modelInput').value = product.name;
+            document.getElementById('priceInput').value = formatNumber(product.price);
+
+            const linkBtn = document.getElementById('productLinkBtn');
+            if (product.url && product.url.trim() !== "") {
+                linkBtn.href = product.url;
+                linkBtn.style.display = 'inline-flex';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+
+            const isCamera = (product.type === 'camera');
+            document.getElementById('typeCamera').classList.toggle('active', isCamera);
+            document.getElementById('typeLens').classList.toggle('active', !isCamera);
+            
+            document.getElementById('anshinGroup').style.display = isCamera ? 'none' : 'flex';
+            document.getElementById('btn_b5_free').style.display = isCamera ? 'inline-block' : 'none';
+            document.getElementById('btn_w3_free').style.display = isCamera ? 'inline-block' : 'none';
+            document.getElementById('btn_w5_half').style.display = isCamera ? 'inline-block' : 'none';
+
+            cameraCouponState = { b5: false, w3: false, w5: false };
+            document.getElementById('btn_b5_free').classList.remove('active');
+            document.getElementById('btn_w3_free').classList.remove('active');
+            document.getElementById('btn_w5_half').classList.remove('active');
+
+            originalWarrantyPrices = {
+                b3: product.warranty ? (product.warranty.b3 || 0) : 0,
+                b5: product.warranty ? (product.warranty.b5 || 0) : 0,
+                w3: product.warranty ? (product.warranty.w3 || 0) : 0,
+                w5: product.warranty ? (product.warranty.w5 || 0) : 0
+            };
+
+            updateWarrantyDisplayValues(product);
+        } else {
+            document.getElementById('modelInput').value = "";
+            document.getElementById('priceInput').value = "0";
+            document.getElementById('productLinkBtn').style.display = 'none';
+            document.getElementById('anshinGroup').style.display = 'none';
+            originalWarrantyPrices = { b3: 0, b5: 0, w3: 0, w5: 0 };
+            updateWarrantyDisplayValues({ type: 'camera', warranty: { b3:0, b5:0, w3:0, w5:0 } });
+        }
+    }
+
+    function toggleCameraWarranty(type) {
+        cameraCouponState[type] = !cameraCouponState[type];
+        document.getElementById(`btn_${type}_${type==='w5'?'half':'free'}`).classList.toggle('active', cameraCouponState[type]);
+
+        const catKey = document.getElementById('categorySelect').value;
+        const product = (productDatabase[catKey] || []).find(m => m.id === document.getElementById('modelSelect').value);
+        if (product) updateWarrantyDisplayValues(product);
+    }
+
+    function switchAnshin(status) {
+        isAnshinJoin = status;
+        document.getElementById('anshinOff').classList.toggle('active', !isAnshinJoin);
+        document.getElementById('anshinOn').classList.toggle('active', isAnshinJoin);
+
+        const catKey = document.getElementById('categorySelect').value;
+        const product = (productDatabase[catKey] || []).find(m => m.id === document.getElementById('modelSelect').value);
+        if (product) updateWarrantyDisplayValues(product);
+    }
+
+    function updateWarrantyDisplayValues(product) {
+        const isCamera = (product.type === 'camera');
+        const w510OffLabel = document.getElementById('w510OffLabel');
+
+        let b3 = originalWarrantyPrices.b3;
+        let b5 = originalWarrantyPrices.b5;
+        let w3 = originalWarrantyPrices.w3;
+        let w5 = originalWarrantyPrices.w5;
+
+        if (isCamera) {
+            w510OffLabel.style.display = 'none';
+            if (cameraCouponState.b5) b5 = 0;
+            if (cameraCouponState.w3) w3 = 0;
+            if (cameraCouponState.w5) w5 = Math.floor(w5 / 2);
+        } else {
+            if (isAnshinJoin) {
+                b5 = 0;
+                w3 = 0;
+                let halfPrice = Math.floor(w5 / 2);
+                w5 = Math.floor(halfPrice * 0.9);
+                w510OffLabel.style.display = 'inline';
+            } else {
+                w510OffLabel.style.display = 'none';
+            }
+        }
+
+        document.getElementById('w_b3_val').value = formatNumber(b3);
+        document.getElementById('w_b5_val').value = formatNumber(b5);
+        document.getElementById('w_w3_val').value = formatNumber(w3);
+        document.getElementById('w_w5_val').value = formatNumber(w5);
+    }
+
+    function onPaymentChange() {
+        const paymentSelect = document.getElementById('paymentSelect');
+        const loanContainer = document.getElementById('loanSettingsContainer');
+        if (paymentSelect.value === 'loan') {
+            loanContainer.style.display = 'block';
+        } else {
+            loanContainer.style.display = 'none';
+        }
+    }
+
+    function addTicketRow(name = "ラッキー抽選会", price = 0) {
+        const container = document.getElementById('ticketsContainer');
+        const div = document.createElement('div');
+        div.className = 'ticket-item';
+        div.innerHTML = `
+            <select class="ticket-name" style="flex: 1; min-width: 140px;">
+                <option value="ラッキー抽選会" ${name==='ラッキー抽選会'?'selected':''}>ラッキー抽選会</option>
+                <option value="ワンズ店頭抽選会" ${name==='ワンズ店頭抽選会'?'selected':''}>ワンズ店頭抽選会</option>
+                <option value="αCafe賞" ${name==='αCafe賞'?'selected':''}>αCafe賞</option>
+                <option value="お誕生日" ${name==='お誕生日'?'selected':''}>お誕生日</option>
+            </select>
+            <input type="text" value="${price}" style="width: 90px;" class="ticket-price"> 円分
+            <button type="button" class="danger-btn" onclick="this.parentElement.remove()">削除</button>
+        `;
+        container.appendChild(div);
+    }
+
+    function resetFormForNewEstimate() {
+        document.getElementById('editingEstimateId').value = "";
+        document.getElementById('nameInput').value = "";
+        document.getElementById('couponSelect').value = "0";
+        document.getElementById('sonyPointInput').value = "0";
+        document.getElementById('paymentSelect').selectedIndex = 0;
+        onPaymentChange();
+        document.getElementById('loanDownPayment').value = "0";
+        document.getElementById('loanFeeSelect').value = "24";
+        document.getElementById('loanCount').value = "24";
+        document.getElementById('memoInput').value = "";
+        document.getElementById('ticketsContainer').innerHTML = "";
+        
+        const firstWarranty = document.querySelector('input[name="warranty"]');
+        if (firstWarranty) firstWarranty.checked = true;
+
+        switchAnshin(false);
+        cameraCouponState = { b5: false, w3: false, w5: false };
+        document.getElementById('btn_b5_free').classList.remove('active');
+        document.getElementById('btn_w3_free').classList.remove('active');
+        document.getElementById('btn_w5_half').classList.remove('active');
+
+        const catSel = document.getElementById('categorySelect');
+        catSel.selectedIndex = 0;
+
+        const modelSel = document.getElementById('modelSelect');
+        modelSel.innerHTML = '<option value="" disabled selected>商品を選択してください</option>';
+
+        onModelSelectChange();
+
+        document.getElementById('resultText').value = "";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function calculate() {
+        const name = document.getElementById('nameInput').value.trim();
+        const model = document.getElementById('modelInput').value.trim();
+        let currentPrice = parseFloat(document.getElementById('priceInput').value.replace(/,/g, '')) || 0;
+        
+        const catKey = document.getElementById('categorySelect').value;
+        const product = (productDatabase[catKey] || []).find(m => m.id === document.getElementById('modelSelect').value);
+        const isCamera = product ? (product.type === 'camera') : true;
+
+        let outputLines = [];
+        if (name !== "") {
+            outputLines.push(`${name} 様`);
+            outputLines.push(``);
+        }
+        outputLines.push(`▼${model ? model : '商品未選択'} お見積もり`);
+        outputLines.push(`・ソニーストア販売価格`);
+        outputLines.push(`${formatNumber(currentPrice)} 円 (税込)`);
+
+        const couponVal = document.getElementById('couponSelect').value;
+        const couponSelectElem = document.getElementById('couponSelect');
+        let couponLabel = couponSelectElem.options[couponSelectElem.selectedIndex].text;
+        
+        if (couponVal !== "0") {
+            let discountRate = 0;
+            if (couponVal === "10") discountRate = 0.10;
+            else if (couponVal === "13") discountRate = 0.13;
+            else if (couponVal === "15_anshin" || couponVal === "15_株主") discountRate = 0.15;
+
+            let discountAmount = Math.floor(currentPrice * discountRate);
+            currentPrice -= discountAmount;
+
+            outputLines.push(``);
+            outputLines.push(`・${couponLabel} 使用`);
+            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+        }
+
+        const selectedWarrantyElem = document.querySelector('input[name="warranty"]:checked');
+        const selectedWarranty = selectedWarrantyElem ? selectedWarrantyElem.value : 'b3';
+        let warrantyName = "";
+        let warrantyPrice = 0;
+        let warrantyLineText = "";
+
+        if (selectedWarranty === "b3") {
+            warrantyName = "3年ベーシック";
+            warrantyPrice = parseFloat(document.getElementById('w_b3_val').value.replace(/,/g, '')) || 0;
+            if (warrantyPrice > 0) {
+                warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+            } else {
+                warrantyLineText = `・長期保証 ${warrantyName}`;
+            }
+        } else if (selectedWarranty === "b5") {
+            warrantyName = "5年ベーシック";
+            warrantyPrice = parseFloat(document.getElementById('w_b5_val').value.replace(/,/g, '')) || 0;
+            if (isCamera) {
+                if (cameraCouponState.b5) {
+                    warrantyLineText = `・長期保証5年ベーシック（0円）無料クーポン使用`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            } else {
+                if (isAnshinJoin) {
+                    warrantyLineText = `・長期保証5年ベーシック（0円）αあんしんプログラム加入者`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            }
+        } else if (selectedWarranty === "w3") {
+            warrantyName = "3年ワイド";
+            warrantyPrice = parseFloat(document.getElementById('w_w3_val').value.replace(/,/g, '')) || 0;
+            if (isCamera) {
+                if (cameraCouponState.w3) {
+                    warrantyLineText = `・長期保証3年ワイド（0円）無料クーポン使用`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            } else {
+                if (isAnshinJoin) {
+                    warrantyLineText = `・長期保証3年ワイド（0円）αあんしんプログラム加入者`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            }
+        } else if (selectedWarranty === "w5") {
+            warrantyName = "5年ワイド";
+            warrantyPrice = parseFloat(document.getElementById('w_w5_val').value.replace(/,/g, '')) || 0;
+            if (isCamera) {
+                if (cameraCouponState.w5) {
+                    warrantyLineText = `・長期保証 5年ワイド（+${formatNumber(warrantyPrice)}円）半額クーポン使用`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            } else {
+                if (isAnshinJoin) {
+                    warrantyLineText = `・長期保証 5年ワイド（+${formatNumber(warrantyPrice)}円）αあんしん加入者 半額+10%OFF`;
+                } else {
+                    warrantyLineText = `・長期保証 ${warrantyName}（+${formatNumber(warrantyPrice)}円）`;
+                }
+            }
+        }
+
+        if (warrantyLineText !== "") {
+            currentPrice += warrantyPrice;
+            outputLines.push(``);
+            outputLines.push(warrantyLineText);
+            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+        }
+
+        const ticketItems = document.querySelectorAll('.ticket-item');
+        ticketItems.forEach(item => {
+            const tSelect = item.querySelector('.ticket-name');
+            const tName = tSelect.value;
+            const tPrice = parseFloat(item.querySelector('.ticket-price').value.replace(/,/g, '')) || 0;
+            if (tPrice > 0) {
+                currentPrice -= tPrice;
+                if (currentPrice < 0) currentPrice = 0;
+                
+                outputLines.push(``);
+                outputLines.push(`・${tName} ${formatNumber(tPrice)}円分のお買い物券使用`);
+                outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+            }
+        });
+
+        const sonyPoints = parseFloat(document.getElementById('sonyPointInput').value) || 0;
+        if (sonyPoints > 0) {
+            currentPrice -= sonyPoints;
+            if (currentPrice < 0) currentPrice = 0;
+
+            outputLines.push(``);
+            outputLines.push(`・ソニーポイント：${formatNumber(sonyPoints)} pt`);
+            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+        }
+
+        const paymentSelect = document.getElementById('paymentSelect');
+        const paymentVal = paymentSelect.value;
+        const paymentLabel = paymentSelect.options[paymentSelect.selectedIndex].text;
+
+        if (paymentVal === "sony_card" || paymentVal === "sony_bank") {
+            let paymentDiscount = Math.floor(currentPrice * 0.03);
+            currentPrice -= paymentDiscount;
+            outputLines.push(``);
+            outputLines.push(`・${paymentLabel}`);
+            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+        } else if (paymentVal === "loan") {
+            const downPayment = parseFloat(document.getElementById('loanDownPayment').value) || 0;
+            const count = parseInt(document.getElementById('loanCount').value) || 1;
+            const freeCount = parseInt(document.getElementById('loanFeeSelect').value) || 0;
+            
+            const loanTotalBase = Math.max(0, currentPrice - downPayment);
+            
+            let totalFee = 0;
+            let feeText = "";
+
+            if (count <= freeCount) {
+                totalFee = 0;
+                feeText = `手数料0円`;
+            } else {
+                // 無料回数を超えた場合は年率1%で手数料を計算
+                const annualRate = 0.01;
+                const years = count / 12;
+                totalFee = Math.round(loanTotalBase * annualRate * years);
+                feeText = `手数料適用(年率1%)`;
+            }
+
+            const loanTotalWithFee = loanTotalBase + totalFee;
+            
+            let monthly = Math.floor((loanTotalWithFee / count) / 100) * 100;
+            if (monthly < 100) monthly = loanTotalWithFee;
+            let firstPayment = loanTotalWithFee - (monthly * (count - 1));
+
+            outputLines.push(``);
+            outputLines.push(`▼分割払い－－－－`);
+            outputLines.push(`・総支払額：${formatNumber(currentPrice)}円(税込)`);
+            outputLines.push(`・頭金：${formatNumber(downPayment)}円`);
+            outputLines.push(``);
+            outputLines.push(`・分割払い総額：${formatNumber(loanTotalBase)}円(税込)`);
+            outputLines.push(`・支払回数（${count}回払い）${feeText}`);
+            if (totalFee > 0) {
+                outputLines.push(`・分割手数料：${formatNumber(totalFee)}円`);
+            }
+            outputLines.push(``);
+            outputLines.push(`初回：${formatNumber(firstPayment)}円 × 1回`);
+            outputLines.push(`月々：${formatNumber(monthly)}円 × ${count - 1}回`);
+            outputLines.push(`－－－－－－－－－`);
+            outputLines.push(`分割支払い合計：${formatNumber(loanTotalWithFee)}円(税込)`);
+        } else {
+            outputLines.push(``);
+            outputLines.push(`・${paymentLabel}`);
+            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
+        }
+
+        const memo = document.getElementById('memoInput').value.trim();
+        if (memo !== "") {
+            outputLines.push(``);
+            outputLines.push(`・メモ：${memo}`);
+        }
+
+        document.getElementById('resultText').value = outputLines.join('\n');
+        return currentPrice;
+    }
+
+    function saveEstimate() {
+        const finalPrice = calculate();
+        const name = document.getElementById('nameInput').value.trim() || "（お名前なし）";
+        const model = document.getElementById('modelInput').value.trim() || "商品未選択";
+        const editingId = document.getElementById('editingEstimateId').value;
+
+        const tickets = [];
+        document.querySelectorAll('.ticket-item').forEach(item => {
+            tickets.push({
+                name: item.querySelector('.ticket-name').value,
+                price: item.querySelector('.ticket-price').value
+            });
+        });
+
+        const estimateData = {
+            id: editingId ? editingId : 'est_' + Date.now(),
+            dateTime: editingId ? getExistingDateTime(editingId) : new Date().toLocaleString(),
+            name: name,
+            model: model,
+            finalPrice: formatNumber(finalPrice) + ' 円',
+            formData: {
+                category: document.getElementById('categorySelect').value,
+                modelSelect: document.getElementById('modelSelect').value,
+                modelInput: model,
+                isAnshinJoin: isAnshinJoin,
+                cameraCouponState: JSON.parse(JSON.stringify(cameraCouponState)),
+                couponSelect: document.getElementById('couponSelect').value,
+                warranty: document.querySelector('input[name="warranty"]:checked').value,
+                tickets: tickets,
+                sonyPoints: document.getElementById('sonyPointInput').value,
+                paymentSelect: document.getElementById('paymentSelect').selectedIndex,
+                loanDownPayment: document.getElementById('loanDownPayment').value,
+                loanFeeSelect: document.getElementById('loanFeeSelect').value,
+                loanCount: document.getElementById('loanCount').value,
+                memo: document.getElementById('memoInput').value
+            }
+        };
+
+        if (editingId) {
+            const index = estimateHistory.findIndex(e => e.id === editingId);
+            if (index !== -1) {
+                estimateHistory[index] = estimateData;
+            } else {
+                estimateHistory.unshift(estimateData);
+            }
+            document.getElementById('editingEstimateId').value = "";
+            alert('見積もり内容を更新しました！');
+        } else {
+            estimateHistory.unshift(estimateData);
+            alert('見積もりを新しく保存しました！');
+        }
+
+        saveEstimateHistoryStorage();
+        renderEstimateHistory();
+    }
+
+    function getExistingDateTime(id) {
+        const found = estimateHistory.find(e => e.id === id);
+        return found ? found.dateTime : new Date().toLocaleString();
+    }
+
+    function renderEstimateHistory() {
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = "";
+
+        if (estimateHistory.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #777;">保存された見積もりはありません。</td></tr>`;
+            return;
+        }
+
+        estimateHistory.forEach(est => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="white-space: nowrap; font-size: 0.8rem;">${est.dateTime}</td>
+                <td>${est.name} 様</td>
+                <td>${est.model}</td>
+                <td style="font-weight: bold; color: #d97706; white-space: nowrap;">${est.finalPrice}</td>
+                <td style="white-space: nowrap;">
+                    <button type="button" class="sub-btn" onclick="loadEstimate('${est.id}')" style="padding: 4px 8px; font-size: 0.8rem;">呼出</button>
+                    <button type="button" class="sub-btn" onclick="copyAndNewEstimate('${est.id}')" style="padding: 4px 8px; font-size: 0.8rem; background: #10b981;" title="この内容を別名で新規保存用にコピーします">別名でコピー</button>
+                    <button type="button" class="danger-btn" onclick="deleteEstimate('${est.id}')" style="padding: 4px 8px; font-size: 0.8rem;">削除</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function loadEstimate(id) {
+        const est = estimateHistory.find(e => e.id === id);
+        if (!est) return;
+
+        document.getElementById('editingEstimateId').value = est.id;
+        document.getElementById('nameInput').value = est.name === "（お名前なし）" ? "" : est.name;
+        
+        const fd = est.formData;
+        document.getElementById('categorySelect').value = fd.category;
+        onCategoryChange();
+
+        document.getElementById('modelSelect').value = fd.modelSelect;
+        onModelSelectChange();
+
+        document.getElementById('modelInput').value = fd.modelInput;
+
+        switchAnshin(fd.isAnshinJoin);
+        cameraCouponState = JSON.parse(JSON.stringify(fd.cameraCouponState));
+        document.getElementById('btn_b5_free').classList.toggle('active', cameraCouponState.b5);
+        document.getElementById('btn_w3_free').classList.toggle('active', cameraCouponState.w3);
+        document.getElementById('btn_w5_half').classList.toggle('active', cameraCouponState.w5);
+
+        const catKey = document.getElementById('categorySelect').value;
+        const product = (productDatabase[catKey] || []).find(m => m.id === fd.modelSelect);
+        if (product) updateWarrantyDisplayValues(product);
+
+        document.getElementById('couponSelect').value = fd.couponSelect;
+
+        const wRadio = document.querySelector(`input[name="warranty"][value="${fd.warranty}"]`);
+        if (wRadio) wRadio.checked = true;
+
+        document.getElementById('ticketsContainer').innerHTML = "";
+        if (fd.tickets && fd.tickets.length > 0) {
+            fd.tickets.forEach(t => addTicketRow(t.name, t.price));
+        }
+
+        if (fd.sonyPoints !== undefined) {
+            document.getElementById('sonyPointInput').value = fd.sonyPoints;
+        } else {
+            document.getElementById('sonyPointInput').value = "0";
+        }
+
+        document.getElementById('paymentSelect').selectedIndex = fd.paymentSelect;
+        onPaymentChange();
+        if (fd.loanDownPayment !== undefined) document.getElementById('loanDownPayment').value = fd.loanDownPayment;
+        if (fd.loanFeeSelect !== undefined) document.getElementById('loanFeeSelect').value = fd.loanFeeSelect;
+        if (fd.loanCount !== undefined) document.getElementById('loanCount').value = fd.loanCount;
+
+        document.getElementById('memoInput').value = fd.memo;
+
+        calculate();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        alert(`「${est.name} 様 / ${est.model}」の見積もりを呼び出しました。`);
+    }
+
+    function copyAndNewEstimate(id) {
+        const est = estimateHistory.find(e => e.id === id);
+        if (!est) return;
+
+        document.getElementById('editingEstimateId').value = "";
+        document.getElementById('nameInput').value = "";
+        document.getElementById('nameInput').placeholder = "新しいお名前を入力してください";
+        
+        const fd = est.formData;
+        document.getElementById('categorySelect').value = fd.category;
+        onCategoryChange();
+
+        document.getElementById('modelSelect').value = fd.modelSelect;
+        onModelSelectChange();
+
+        document.getElementById('modelInput').value = fd.modelInput;
+
+        switchAnshin(fd.isAnshinJoin);
+        cameraCouponState = JSON.parse(JSON.stringify(fd.cameraCouponState));
+        document.getElementById('btn_b5_free').classList.toggle('active', cameraCouponState.b5);
+        document.getElementById('btn_w3_free').classList.toggle('active', cameraCouponState.w3);
+        document.getElementById('btn_w5_half').classList.toggle('active', cameraCouponState.w5);
+
+        const catKey = document.getElementById('categorySelect').value;
+        const product = (productDatabase[catKey] || []).find(m => m.id === fd.modelSelect);
+        if (product) updateWarrantyDisplayValues(product);
+
+        document.getElementById('couponSelect').value = fd.couponSelect;
+
+        const wRadio = document.querySelector(`input[name="warranty"][value="${fd.warranty}"]`);
+        if (wRadio) wRadio.checked = true;
+
+        document.getElementById('ticketsContainer').innerHTML = "";
+        if (fd.tickets && fd.tickets.length > 0) {
+            fd.tickets.forEach(t => addTicketRow(t.name, t.price));
+        }
+
+        if (fd.sonyPoints !== undefined) {
+            document.getElementById('sonyPointInput').value = fd.sonyPoints;
+        } else {
+            document.getElementById('sonyPointInput').value = "0";
+        }
+
+        document.getElementById('paymentSelect').selectedIndex = fd.paymentSelect;
+        onPaymentChange();
+        if (fd.loanDownPayment !== undefined) document.getElementById('loanDownPayment').value = fd.loanDownPayment;
+        if (fd.loanFeeSelect !== undefined) document.getElementById('loanFeeSelect').value = fd.loanFeeSelect;
+        if (fd.loanCount !== undefined) document.getElementById('loanCount').value = fd.loanCount;
+
+        document.getElementById('memoInput').value = fd.memo;
+
+        calculate();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        alert('設定内容をコピーしました！「お名前」を新しい方に書き換えて、「この内容で見積もりを保存 / 更新する」を押してください。');
+    }
+
+    function deleteEstimate(id) {
+        if (!confirm('この見積もり履歴を削除しますか？')) return;
+        estimateHistory = estimateHistory.filter(e => e.id !== id);
+        saveEstimateHistoryStorage();
+        renderEstimateHistory();
+        
+        if (document.getElementById('editingEstimateId').value === id) {
+            document.getElementById('editingEstimateId').value = "";
+        }
+    }
+
+    function clearAllEstimates() {
+        if (!confirm('保存されているすべての履歴を削除しますか？')) return;
+        estimateHistory = [];
+        saveEstimateHistoryStorage();
+        renderEstimateHistory();
+        document.getElementById('editingEstimateId').value = "";
+    }
+
+    function copyResultText() {
+        const textarea = document.getElementById('resultText');
+        const msg = document.getElementById('copyStatusMsg');
+        
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(textarea.value).then(() => {
+            msg.textContent = "✅ 計算結果をクリップボードにコピーしました！";
+            msg.style.color = "#059669";
+            setTimeout(() => {
+                msg.textContent = "下のテキストボックスはクリックしてコピーできます";
+                msg.style.color = "#666";
+            }, 3000);
+        }).catch(err => {
+            alert('コピーに失敗しました。');
+        });
+    }
+
+    window.onload = function() {
+        renderMasterTable();
+        renderEstimateHistory();
+        resetFormForNewEstimate();
+    };
+</script>
+
+</body>
+</html>
