@@ -15,11 +15,12 @@
             font-size: 16px;
         }
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.25rem; /* スマホで改行されないよう少し小さく調整 */
             text-align: center;
             margin-bottom: 20px;
             color: #d97706;
             letter-spacing: 0.05em;
+            white-space: nowrap; /* 強制的に改行させない */
         }
         .section {
             background: #ffffff;
@@ -725,18 +726,15 @@
                 const text = e.target.result;
                 const lines = text.split(/\r\n|\n/);
                 
-                // 新しい一時データベース構造を作成（既存キーをすべて保持しつつモデルをクリア）
                 let newDb = {};
                 for (const key of Object.keys(defaultProductDatabase)) {
                     newDb[key] = [];
                 }
 
-                // 1行目はヘッダーとみなしてスキップ
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
 
-                    // CSVパース（ダブルクォーテーション対応簡易版）
                     let row = [];
                     let inQuotes = false;
                     let currentVal = '';
@@ -1279,7 +1277,6 @@
                 totalFee = 0;
                 feeText = `手数料0円`;
             } else {
-                // 無料回数を超えた場合は年率1%で手数料を計算
                 const annualRate = 0.01;
                 const years = count / 12;
                 totalFee = Math.round(loanTotalBase * annualRate * years);
