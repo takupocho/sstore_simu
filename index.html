@@ -453,8 +453,7 @@
         <div class="form-group">
             <label>割引クーポンを選択</label>
             <select id="couponSelect">
-                <option value="0" selected>なし</option>
-                <option value="10">10%OFF (通常)</option>
+                <option value="10" selected>10%OFF (通常)</option>
                 <option value="13">13%OFF (ワンズ店頭)</option>
                 <option value="15_anshin">15%OFF (αあんしんプログラムご愛顧感謝)</option>
                 <option value="15_株主">15%OFF (株主優待)</option>
@@ -1091,7 +1090,7 @@
     function resetFormForNewEstimate() {
         document.getElementById('editingEstimateId').value = "";
         document.getElementById('nameInput').value = "";
-        document.getElementById('couponSelect').value = "0";
+        document.getElementById('couponSelect').value = "10";
         document.getElementById('sonyPointInput').value = "0";
         document.getElementById('paymentSelect').selectedIndex = 0;
         onPaymentChange();
@@ -1144,19 +1143,17 @@
         const couponSelectElem = document.getElementById('couponSelect');
         let couponLabel = couponSelectElem.options[couponSelectElem.selectedIndex].text;
         
-        if (couponVal !== "0") {
-            let discountRate = 0;
-            if (couponVal === "10") discountRate = 0.10;
-            else if (couponVal === "13") discountRate = 0.13;
-            else if (couponVal === "15_anshin" || couponVal === "15_株主") discountRate = 0.15;
+        let discountRate = 0;
+        if (couponVal === "10") discountRate = 0.10;
+        else if (couponVal === "13") discountRate = 0.13;
+        else if (couponVal === "15_anshin" || couponVal === "15_株主") discountRate = 0.15;
 
-            let discountAmount = Math.floor(currentPrice * discountRate);
-            currentPrice -= discountAmount;
+        let discountAmount = Math.floor(currentPrice * discountRate);
+        currentPrice -= discountAmount;
 
-            outputLines.push(``);
-            outputLines.push(`・${couponLabel} 使用`);
-            outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
-        }
+        outputLines.push(``);
+        outputLines.push(`・${couponLabel} 使用`);
+        outputLines.push(`→${formatNumber(currentPrice)} 円 (税込)`);
 
         const selectedWarrantyElem = document.querySelector('input[name="warranty"]:checked');
         const selectedWarranty = selectedWarrantyElem ? selectedWarrantyElem.value : 'b3';
