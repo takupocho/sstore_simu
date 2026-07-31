@@ -344,11 +344,18 @@
         .memo-template-btn:hover {
             background: #fde68a;
         }
+        /* データロード中のステータス表示用スタイル */
+        #loadingStatus {
+            font-size: 0.85rem;
+            color: #d97706;
+            margin-left: 10px;
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>
 
-    <h1>✨ ソニーストア 見積もりシミュ ✨</h1>
+    <h1>✨ ソニーストア 見積もりシミュ ✨ <span id="loadingStatus"></span></h1>
 
     <!-- マスター管理セクション -->
     <div class="section" style="background: #fffdf9; border: 1.5px dashed #fcd34d;">
@@ -741,15 +748,45 @@
         lens_apsc_muji_other: []
     };
 
-    let productDatabase = loadProductDatabase();
+    // グローバル変数として初期定義
+    let productDatabase = JSON.parse(JSON.stringify(defaultProductDatabase));
     let estimateHistory = loadEstimateHistory();
 
-    function loadProductDatabase() {
-        const saved = localStorage.getItem('sony_product_database');
-        if (saved) {
-            try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    // アプリ起動時に外部URLからマスターデータを自動で読み込む関数
+    async function loadMasterDataFromRemote() {
+        const statusSpan = document.getElementById('loadingStatus');
+        const masterUrl = 'https://takupocho.github.io/sstore_simu/sony_master.json'; //[cite: 4]
+        
+        statusSpan.textContent = '（マスターデータ読込中...）';
+        
+        try {
+            const response = await fetch(masterUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const remoteData = await response.json();
+            
+            // 取得成功時は productDatabase にセットし、ローカルストレージも最新データで同期保存
+            productDatabase = remoteData;
+            saveProductDatabase();
+            
+            statusSpan.textContent = '（マスターデータ自動読込完了）';
+            statusSpan.style.color = '#10b981';
+            setTimeout(() => { statusSpan.textContent = ''; }, 3500);
+            
+        } catch (error) {
+            console.warn('外部マスターデータの取得に失敗しました。ローカルストレージまたは初期データを使用します。', error);
+            
+            // 失敗時は従来の localStorage 保存データがあれば読み込み、なければデフォルト
+            const saved = localStorage.getItem('sony_product_database');
+            if (saved) {
+                try { productDatabase = JSON.parse(saved); } catch (e) { console.error(e); }
+            }
+            
+            statusSpan.textContent = '（ローカルマスターデータを使用）';
+            statusSpan.style.color = '#6b7280';
+            setTimeout(() => { statusSpan.textContent = ''; }, 3500);
         }
-        return JSON.parse(JSON.stringify(defaultProductDatabase));
     }
 
     function saveProductDatabase() {
@@ -788,6 +825,7 @@
             localStorage.removeItem('sony_product_database');
             productDatabase = JSON.parse(JSON.stringify(defaultProductDatabase));
             renderMasterTable();
+            onCategoryChange();
             alert('初期状態に戻しました。');
         }
     }
@@ -1804,7 +1842,9 @@
         });
     }
 
-    window.onload = function() {
+    // 起動時の初期化処理（非同期で外部URLからマスターデータを読み込んだ後にUI等を構築）
+    window.onload = async function() {
+        await loadMasterDataFromRemote();
         renderMasterTable();
         renderEstimateHistory();
         resetFormForNewEstimate();
